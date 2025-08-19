@@ -1,0 +1,110 @@
+---
+title: "Talk to Gmail"
+publishedAt: "2024-04-08"
+summary: "An exploration of an AI agent designed to enhance email management within Gmail."
+---
+
+## Context and Motivation
+
+This project focuses on developing an AI agent that integrates with Gmail to enable advanced email management. The core functionality includes:
+
+1. **Email Retrieval and Semantic Search:** The AI agent retrieves emails and stores them in a vector index for semantic search, allowing users to query emails with context-aware responses.
+2. **Email Management Features:** In addition to semantic search, the application supports basic email management tasks such as drafting, updating, sending, and deleting emails.
+
+The project explores different strategies for **Retrieval-Augmented Generation (RAG)** and AI agents. The inspiration came from a tweet by Guillermo Rauch on the concept of "talking to email," which prompted the development of this AI-driven approach.
+
+### Technology Stack
+
+- **Frontend & backend:** Built with **Next.js**.
+- **AI Models:** Integrated **OpenAI GPT-4O** and **GPT-4O-Mini** for natural language processing.
+- **Additional AI Tools:** **Groq Whisper-Large-V3-Turbo** speech-to-text, and **Cartesia Sonic** text-to-speech.
+- **Authentication:** **Auth.js** for managing access and refresh tokens.
+- **Gmail API:** Interaction with Gmail API endpoints is facilitated through the **Gmail OpenAPI SDK**.
+- **Exploration phase :** **Python** with **LlamaIndex** for exploring RAG strategies and AI agent architectures.
+
+Github : [https://github.com/ErkanTurut/eo](https://github.com/ErkanTurut/eo)
+
+## Gmail Query Engine
+
+![talk-to-gmail-diagram.png](/blog/talk-to-gmail-diagram.png)
+
+### Initial Email Retrieval Strategy
+
+The foundation of the query engine lies in its ability to efficiently retrieve relevant emails from Gmail's API. This presents an interesting challenge: the content we're searching for exists somewhere in the email corpus, but we can't know exactly which words appear in the target emails. This requires a delicate balance in query construction - too strict, and we might miss relevant emails; too loose, and we'll retrieve too many irrelevant ones.
+
+To address this challenge, I implemented an AI-driven query generation system using the GPT-4O-mini model. This system follows a sophisticated process to create optimal search parameters:
+
+The model generates three distinct query variations, each serving a different purpose in the search strategy. The first variation creates a strict query focusing on essential terms for precision. The second produces an expanded query that includes alternative phrasings and related keywords. The third generates a loose query that reduces constraints to capture a broader range of potentially relevant emails.
+
+These queries are then enhanced with Gmail's advanced search operators (such as 'from:', 'to:', 'subject:', 'label:', and 'category:'). Rather than executing three separate API requests, I developed a method to merge these queries into a single comprehensive search parameter, optimizing API usage.
+
+### Email Content Processing
+
+Once emails are retrieved, they undergo a crucial transformation process. The goal is to preserve the essential meaning while reducing noise that could interfere with later processing stages. Through experimentation, I discovered that URLs significantly impact embedding quality - their presence in email bodies creates excessive noise that often leads to retrieval failures. The system carefully extracts and stores metadata (sender, receiver, etc.) separately while cleaning the main content.
+
+## Vector Index Implementation
+
+### Content Chunking Strategy
+
+I utilized LlamaIndex's vector index store for managing email content. The system splits emails into manageable chunks using a sentence splitter approach. While I experimented with semantic chunking (grouping content by meaning), the simpler sentence-based approach proved more effective and computationally efficient. Each chunk maintains a consistent length to ensure compatibility with LLM context windows.
+
+Every node in the system contains comprehensive metadata, including message ID, thread ID, sender, recipient, subject, date, snippet, and labels. This metadata enriches the context available during retrieval while keeping the actual text content focused on the email body.
+
+### Vector Store Architecture
+
+The power of this vector store implementation lies in its ability to maintain relationships between chunks. When retrieving content, the system can easily access preceding and following nodes, preserving the full context of any retrieved segment. This connectivity is crucial for maintaining coherent understanding of email threads and conversations.
+
+### Embedding Process
+
+The system uses OpenAI's embedding model to transform each email chunk into a vector representation. This transformation allows for semantic similarity comparisons, enabling more intelligent search capabilities than traditional keyword matching.
+
+## Query Processing and Retrieval
+
+### Query Enhancement
+
+To maximize retrieval effectiveness, I implemented another layer of query processing using GPT-4O-mini. The system generates three variants of the user's original query:
+
+The first variant rewords the query while maintaining its core meaning. The second introduces contextually relevant terms and alternative phrasings. The third emphasizes critical details and high-signal keywords. This approach helps overcome potential mismatches between user phrasing and email content.
+
+### Retrieval Process
+
+The [LlamaIndex](https://docs.llamaindex.ai/en/v0.10.33/understanding/querying/querying/#stages-of-querying) query engine converts both the enhanced queries and email content into vector representations, enabling mathematical comparison of semantic similarity. Using a top-k strategy, the system identifies the most relevant email chunks based on vector similarity. For each selected chunk, the system also retrieves connected nodes to maintain context.
+
+### Response Generation
+
+The final stage synthesizes the retrieved information through an LLM, generating four distinct responses (one for the original query and one for each variant). This approach provides comprehensive coverage of the user's information need, ensuring important details aren't missed due to query phrasing variations.
+
+# Exploring AI Agent Architectures
+
+In developing an AI agent for Gmail, I explored different architectural approaches to create a system that could effectively understand natural language requests and either provide information or complete specific tasks. The goal was to find the optimal balance between capability and practical usability in a real-world email management context.
+
+## Explored Approaches
+
+### ReAct: Reasoning and Action Agent
+
+ReAct represents a straightforward yet powerful approach to building AI agents. Its key innovation lies in combining two essential capabilities: reasoning and action. The reasoning component enables the agent to think through and understand user requests, while the action component allows it to interact with external systems, in this case, the Gmail API.
+
+What makes ReAct particularly effective is its interactive nature. When handling email-related tasks, the agent demonstrates sophisticated behavior by requesting clarification when user instructions are ambiguous. It can break down complex tasks into a series of actions and provide clear feedback about task completion throughout the process.
+
+To illustrate this approach, consider a user requesting "Send an email to the team about tomorrow's meeting." The ReAct agent processes this request by first drafting the email using a composition tool. It then proceeds to use the sending tool to deliver the message, and finally confirms the action's completion to the user. This systematic approach ensures reliable task execution while maintaining clear communication with the user.
+
+### LATS: Language Agent Tree Search
+
+LATS represents a more sophisticated approach that integrates multiple advanced AI methodologies.
+
+- The first key component is Chain-of-Thought (CoT), which breaks down complex problems into smaller, manageable steps, creating a logical progression from question to answer.
+- This is enhanced by Tree-of-Thought (ToT), which takes problem-solving to the next level by exploring multiple potential solutions simultaneously and using search algorithms to find optimal paths.
+
+The system employs Monte Carlo Tree Search (MCTS) to generate multiple possible actions at each decision point. This powerful algorithm evaluates different paths to find the most promising solutions and can learn from failures through reflection.
+
+The process involves generating multiple potential solutions—typically five—at each step, evaluating them, and choosing the most promising path forward. Perhaps most impressively, LATS can learn from its mistakes by analyzing failed attempts and storing this knowledge for future use.
+
+_Source : [https://arxiv.org/pdf/2310.04406v2](https://arxiv.org/pdf/2310.04406v2)_
+
+## Practical Findings
+
+Through extensive experimentation with LATS, I encountered several significant practical limitations. The processing times consistently proved too long for real-world use, with the system often continuing computations without providing timely responses. Despite its sophisticated architecture, the complex system proved unnecessary for most common email management tasks. The additional computational overhead didn't translate to meaningfully better results for typical email interactions.
+
+## Conclusion
+
+In the specific context of Gmail interaction, I found the ReAct architecture to be the optimal choice. The system provides consistently fast response times while maintaining sufficient capability for handling common email tasks. The user experience benefits significantly from these quick, effective interactions. This exploration revealed an important lesson: while more complex architectures like LATS offer impressive capabilities, simpler solutions often prove more practical for specific, focused applications. ReAct's carefully balanced combination of reasoning and action capabilities matched the needs for email management tasks perfectly, without introducing unnecessary complexity that could hinder performance.
