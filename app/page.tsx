@@ -4,10 +4,14 @@ export default function Page() {
   return (
     <section>
       <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
-        My Portfolio
+        erkan turut
       </h1>
-      <p className="mb-4">{`YO`}</p>
-      <div className="my-8">
+      <p className="mb-4">
+        {`
+        hi, I'm erkan. I just like building systems.
+        `}
+      </p>
+      <div className="my-8 ">
         <BlogPosts />
       </div>
     </section>
