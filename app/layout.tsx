@@ -36,17 +36,15 @@ export const metadata: Metadata = {
   },
 };
 
-const cx = (...classes) => classes.filter(Boolean).join(" ");
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cx(GeistSans.variable, GeistMono.variable)}>
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="antialiased max-w-xl mx-4 lg:mx-auto min-h-dvh flex flex-col overflow-x-clip">
+        <main className="flex-1 min-w-0 flex flex-col px-2 md:px-0 pt-6">
           <Navbar />
           {children}
           <Footer />
