@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // If you later use next/image with remote URLs, add allowed patterns here.
   images: {
     remotePatterns: [
       {

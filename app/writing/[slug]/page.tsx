@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
-import { formatDate, getBlogPosts } from "app/blog/utils";
+import { formatDate, getBlogPosts } from "@/writing/utils";
 import { baseUrl } from "app/sitemap";
 import { TableOfContents } from "app/components/table-of-contents";
 import { Separator } from "@/components/ui/separator";
@@ -38,7 +38,7 @@ export async function generateMetadata(props) {
       description,
       type: "article",
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/writing/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -78,7 +78,7 @@ export default async function Blog(props) {
             image: post.metadata.image
               ? `${baseUrl}${post.metadata.image}`
               : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            url: `${baseUrl}/writing/${post.slug}`,
             author: {
               "@type": "Person",
               name: "My Portfolio",

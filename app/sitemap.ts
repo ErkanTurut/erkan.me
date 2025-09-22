@@ -1,14 +1,14 @@
-import { getBlogPosts } from "app/blog/utils";
+import { getBlogPosts } from "@/writing/utils";
 
 export const baseUrl = "https://erkanturut.me";
 
 export default async function sitemap() {
   let blogs = getBlogPosts().map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
+    url: `${baseUrl}/writing/${post.slug}`,
     lastModified: post.metadata.publishedAt,
   }));
 
-  let routes = ["", "/blog"].map((route) => ({
+  let routes = ["", "/writing"].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString().split("T")[0],
   }));

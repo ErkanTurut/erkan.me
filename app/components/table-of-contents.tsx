@@ -156,7 +156,7 @@ export function TableOfContents({
     >
       <HoverCard openDelay={150}>
         <HoverCardTrigger asChild>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2 ">
             {headings.map((h) => (
               <a
                 key={h.id}
@@ -185,7 +185,7 @@ export function TableOfContents({
         <HoverCardContent
           side="left"
           align="center"
-          className="w-64 max-w-[calc(100vw-3rem)]  p-0"
+          className="w-64 max-w-[calc(100vw-3rem)] p-0 shadow-sm"
         >
           <div className="px-4 pt-4 pb-2 text-xs font-medium text-muted-foreground">
             On this page

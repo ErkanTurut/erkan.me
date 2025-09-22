@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDate, getBlogPosts } from "app/blog/utils";
+import { formatDate, getBlogPosts } from "@/writing/utils";
 import { Separator } from "./ui/separator";
 
 export function BlogPosts() {
@@ -20,7 +20,7 @@ export function BlogPosts() {
           <Link
             key={post.slug}
             className="flex flex-col hover:text-primary transition-colors duration-200 ease-in-out"
-            href={`/blog/${post.slug}`}
+            href={`/writing/${post.slug}`}
           >
             <div className="w-full flex flex-col md:flex-row items-baseline space-x-0 md:space-x-2">
               <p className="text-muted-foreground whitespace-nowrap shrink-0 tabular-nums italic text-xs ">

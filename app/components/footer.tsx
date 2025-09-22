@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from "@radix-ui/react-icons";
 export default function Footer() {
   return (
     <footer className="mt-auto pb-1">
-      <ul className="font-mono text-sm gap-4 flex flex-col md:flex-row text-muted-foreground ">
+      <ul className="font-mono text-sm gap-4 flex flex-row text-muted-foreground ">
         <li>
           <a
             className="flex items-center hover:text-foreground transition-colors"
@@ -15,7 +15,7 @@ export default function Footer() {
             <ExternalLinkIcon className="ml-2" />
           </a>
         </li>
-        <li>
+        {/* <li>
           <a
             className="flex items-center hover:text-foreground transition-colors"
             rel="noopener noreferrer"
@@ -25,7 +25,7 @@ export default function Footer() {
             <p>github</p>
             <ExternalLinkIcon className="ml-2" />
           </a>
-        </li>
+        </li> */}
       </ul>
     </footer>
   );

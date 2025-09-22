@@ -1,0 +1,93 @@
+---
+title: "Random Acts of Intelligence: Designing Decision Systems for Uncertain Times"
+publishedAt: "2025-09-20"
+summary: "Most enterprise AI projects fail because organizations try to implement probabilistic AI systems using deterministic decision-making frameworks, requiring a fundamental shift toward probabilistic decision-making that embraces uncertainty rather than fighting it."
+author: "Erkan Turut"
+---
+
+The integration of large language models into enterprise workflows represents more than just a technological upgrade, it demands a fundamental shift in how organizations approach decision-making. While traditional software systems operate deterministically, producing consistent outputs for identical inputs, LLMs operate probabilistically, generating responses based on statistical patterns learned during training. This distinction creates a profound challenge that explains why, according to recent MIT research, 95% of enterprise GenAI pilots fail to reach production.
+
+The issue isn't technical capability, it's conceptual. Most organizations attempt to implement probabilistic AI systems using deterministic decision-making frameworks, creating a fundamental mismatch that undermines success. To understand why this happens and how to address it, we need to examine decision-making through the lens of probabilistic inference methods.
+
+## The Probabilistic-Deterministic Tension
+
+Traditional business software operates like a calculator: given the same inputs, it produces identical outputs every time. A contract management system, for instance, might flag documents containing specific keywords or missing required signatures with perfect consistency. Business processes are built around this predictability.
+
+LLMs, however, function more like expert consultants who might interpret the same contract slightly differently on different days, while still maintaining professional competency. They generate responses by calculating probabilities across vast parameter spaces, meaning identical prompts can yield varying outputs. This probabilistic nature enables their remarkable flexibility and contextual understanding, but it creates challenges when organizations need consistent, verifiable decisions.
+
+Consider a legal document review scenario: an AI system identifies a potential compliance issue and provides what appears to be a direct quote from the contract to support its assessment. Upon verification, however, the "quote" turns out to be a paraphrase, semantically accurate but not verbatim. The AI's analysis may be correct, but the organization's decision-makers need to locate the exact clause to take action. This exemplifies the gap between probabilistic analysis and deterministic decision-making requirements.
+
+## Learning from Probabilistic Inference Theory
+
+The challenge of making decisions with probabilistic systems isn't new. In their seminal 1991 paper "Decision Making Using Probabilistic Inference Methods," Shachter and Peot explored how to structure optimal decision-making when dealing with uncertainty. Their work provides crucial insights for implementing LLM-based systems effectively.
+
+They demonstrated that effective decision-making under uncertainty requires what they called "influence diagrams", structured representations that separate three key components: random variables (uncertainties), decision nodes (choices to be made), and value nodes (desired outcomes). The key insight is that optimal decisions emerge from understanding the relationships between these components, not from eliminating uncertainty.
+
+Applied to LLM implementation, this framework suggests organizations need to:
+
+**Identify Decision Points Clearly**: Where in the workflow do humans need to make choices based on AI analysis? In document review, this might be approving a contract, escalating to legal counsel, or requesting amendments.
+
+**Map Information Flow**: How does probabilistic AI output inform human decision-makers? The system might assess risk levels, but humans decide what risk threshold triggers specific actions.
+
+**Design Value Functions**: What outcomes are we optimizing for? Speed, accuracy, cost reduction, or risk mitigation? Different objectives may require different approaches to handling AI uncertainty.
+
+**Establish Verification Protocols**: How can decision-makers validate AI analysis when needed? This requires deterministic anchors, direct links to source material that allow human verification of AI insights.
+
+Initially, I thought LLM-based systems would complicate the traditional influence diagram by creating what I called "nested probabilistic inference." But upon reflection, I believe the opposite is true, properly implementing LLMs actually simplifies and clarifies the decision structure when we frame it correctly.
+
+The key insight is this: instead of treating LLM outputs as sources of truth with attached uncertainty, we should treat them as random variables in their own right. This reframing transforms what appears to be added complexity into elegant simplicity.
+
+Consider a contract approval workflow. Traditionally, the influence diagram might show:
+
+- Random variables: Market conditions, counterparty reliability, contract terms (as understood through human analysis)
+- Decision node: Approve/reject/negotiate contract
+- Value node: Risk-adjusted profitability
+
+With an LLM system, rather than complicating this structure, we can actually make it more explicit and manageable:
+
+- Random variables: Market conditions, counterparty reliability, AND LLM interpretation of contract risks
+- Decision node 1: Do we validate/trust this LLM interpretation? (explicit validation decision)
+- Decision node 2: Based on validated information, approve/reject/negotiate contract
+- Value node: Risk-adjusted profitability
+
+This approach doesn't break the influence diagram framework, it extends it properly. The LLM interpretation becomes just another source of uncertain information, like market forecasts or credit ratings, that informs but doesn't determine business decisions. The critical addition is the explicit validation decision node, which makes human oversight a formal part of the decision process rather than an afterthought.
+
+What makes this framework particularly powerful is that it acknowledges the probabilistic nature of LLM outputs while preserving human agency in the decision process. The validation decision node can incorporate factors like:
+
+- Confidence scores from the LLM
+- Complexity of the analysis required
+- Stakes of the ultimate business decision
+- Available time for human verification
+- Track record of the AI system's accuracy in similar contexts
+
+By treating LLM outputs as random variables subject to validation decisions, we maintain the theoretical elegance of influence diagrams while creating practical frameworks for human-AI collaboration. This approach explains why organizations that explicitly design validation workflows into their AI implementations tend to achieve better outcomes than those that treat AI outputs as deterministic recommendations requiring simple accept/reject decisions.
+
+The Shachter and Peot framework, properly applied, doesn't just accommodate probabilistic AI systems, it illuminates how to design them for optimal decision-making from the start.
+
+## Bridging Theory and Practice: The Document Analysis Challenge
+
+Where this theoretical framework meets practical reality is in complex document analysis, one of the most common enterprise AI use cases. When organizations attempt to process large volumes of sophisticated documents using LLMs, the probabilistic-deterministic tension becomes most apparent and the decision-making challenges most acute.
+
+The core issue is that business decisions require deterministic references while LLMs provide probabilistic interpretations. A legal team needs to know exactly where in a 300-page contract a problematic clause appears, but the LLM might reference "Section 4.2" based on its probabilistic understanding rather than exact textual location. This creates a verification gap that undermines trust and slows adoption.
+
+Moreover, the learning gap identified in recent MIT research, where 95% of enterprise AI initiatives stall, becomes particularly evident in document workflows. Unlike consumer applications where slight variations in AI responses are acceptable, business document analysis requires systems that improve their understanding of organizational standards, learn from expert corrections, and adapt their decision-support capabilities over time.
+
+This is precisely where the influence diagram framework proves most valuable. Instead of treating document complexity as a technical problem to solve, we can model it as part of the probabilistic decision structure, designing workflows that explicitly account for uncertainty while providing the deterministic verification mechanisms that business decisions require.
+
+## The Path Forward: Embracing Probabilistic Decision-Making
+
+Through my observations of organizations grappling with LLM implementation, I've noticed that success comes not from fighting the probabilistic nature of these systems, but from embracing it within well-structured decision frameworks.
+
+Rather than trying to force probabilistic systems into deterministic molds, I've found that organizations benefit from **designing for collaboration, not replacement**. The most effective implementations I've observed position AI as an intelligent collaborator that provides analysis and insights while maintaining clear human authority over final decisions. This requires reimagining workflows where AI capabilities complement human judgment rather than attempting to replicate it.
+
+The learning gap appears to be addressed best by **building adaptive systems** from the start. In my experience, static AI tools that don't evolve with organizational contexts have limited long-term value. The implementations that sustain momentum incorporate feedback mechanisms, contextual learning, and continuous improvement capabilities that allow the system to become more valuable over time.
+
+What I've found particularly important is **establishing verification protocols** early in the design process. Business decisions require audit trails and clear reasoning paths. This means designing systems that not only provide AI analysis but also offer transparent paths for human verification of that analysis, creating those deterministic anchors within probabilistic workflows.
+
+Perhaps most crucially, I've observed that **process integration** matters more than technical sophistication. The implementations that deliver lasting value don't just automate existing processes, they thoughtfully reimagine workflows to leverage both AI capabilities and human expertise in ways that amplify both.
+
+Looking forward, I believe the organizations that will thrive are those that develop comfort with probabilistic decision-making as a discipline. This isn't about accepting lower standards, it's about building more sophisticated decision frameworks that can harness uncertainty as a source of insight rather than treating it as a barrier to overcome.
+
+For those ready to explore these concepts practically, the next logical step involves building agentic workflows that seamlessly combine probabilistic AI analysis with deterministic verification mechanisms, a technical implementation challenge I'll tackle in my next post on creating robust, learning-capable systems using modern frameworks.
+
+The transformation from deterministic to probabilistic business systems represents one of the most significant shifts in organizational decision-making since the advent of computing itself. From what I've seen, mastering this transition requires not just new technology, but fundamentally new ways of thinking about uncertainty, verification, and human-AI collaboration in business contexts.

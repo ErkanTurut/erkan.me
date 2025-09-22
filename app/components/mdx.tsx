@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import { highlight } from "sugar-high";
 import React from "react";
 import { buttonVariants } from "./ui/button";
@@ -33,11 +33,7 @@ function CustomLink(props) {
 
   if (href.startsWith("/")) {
     return (
-      <Link
-        className={buttonVariants({ variant: "link" })}
-        href={href}
-        {...props}
-      >
+      <Link href={href} {...props}>
         {props.children}
       </Link>
     );
@@ -91,7 +87,7 @@ function createHeading(level) {
   return Heading;
 }
 
-let components = {
+let components: MDXRemoteProps["components"] = {
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),
