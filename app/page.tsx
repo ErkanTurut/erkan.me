@@ -9,9 +9,7 @@ export default function Page() {
   return (
     <section>
       <div className="flex justify-between items-center mb-8 ">
-        <h1 className="text-2xl font-semibold tracking-tighter font-mono ">
-          erkan turut
-        </h1>
+        <h1 className="text-2xl font-semibold">Erkan turut</h1>
       </div>
 
       <article className="prose mb-4">

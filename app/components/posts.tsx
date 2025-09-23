@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { formatDate, getBlogPosts } from "@/writing/utils";
-import { Separator } from "./ui/separator";
 
 export function BlogPosts() {
   let allBlogs = getBlogPosts();

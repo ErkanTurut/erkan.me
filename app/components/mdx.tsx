@@ -3,8 +3,9 @@ import Image from "next/image";
 import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import { highlight } from "sugar-high";
 import React from "react";
-import { buttonVariants } from "./ui/button";
+
 import { cn, slugify } from "@/lib/utils";
+import { CornersIcon } from "@radix-ui/react-icons";
 
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
@@ -33,7 +34,7 @@ function CustomLink(props) {
 
   if (href.startsWith("/")) {
     return (
-      <Link href={href} {...props}>
+      <Link href={href} {...props} className="no-underline">
         {props.children}
       </Link>
     );
@@ -46,18 +47,28 @@ function CustomLink(props) {
   return <a target="_blank" rel="noopener noreferrer" {...props} />;
 }
 
-function RoundedImage(props) {
-  const className = [props.className, "rounded-lg border border-primary "]
-    .filter(Boolean)
-    .join(" ");
-  return <Image alt={props.alt} {...props} className={className} />;
-}
-
 function MDXImg(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const className = [props.className, "rounded-md border border-primary "]
-    .filter(Boolean)
-    .join(" ");
-  return <img {...props} className={className} />;
+  const href = typeof props.src === "string" ? props.src : undefined;
+
+  return (
+    <div className="relative inline-block group">
+      <img
+        {...props}
+        className={cn(
+          props.className,
+          "rounded-md border border-border dark:bg-foreground"
+        )}
+      />
+      {href ? (
+        <Link
+          href={href}
+          className="absolute top-2 right-2 z-10 rounded-sm p-1 text-xs text-muted-foreground font-medium backdrop-blur hover:bg-muted hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <CornersIcon />
+        </Link>
+      ) : null}
+    </div>
+  );
 }
 
 function Code({ children, ...props }) {
@@ -94,7 +105,6 @@ let components: MDXRemoteProps["components"] = {
   h4: createHeading(4),
   h5: createHeading(5),
   h6: createHeading(6),
-  Image: RoundedImage,
   img: MDXImg,
   a: CustomLink,
   code: Code,
