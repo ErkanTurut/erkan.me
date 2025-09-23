@@ -6,9 +6,6 @@ export default function Footer() {
     <footer className="mt-auto pb-1">
       <ul className="font-mono text-sm gap-4 flex flex-row text-muted-foreground items-center ">
         <li>
-          <ThemeToggle className="size-8 " />
-        </li>
-        <li>
           <a
             className="flex items-center hover:text-foreground transition-colors"
             rel="noopener noreferrer"
