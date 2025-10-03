@@ -12,7 +12,7 @@ const navItems = {
 
 export function Navbar() {
   return (
-    <aside className="-ml-[8px] mb-4 sm:mb-16 tracking-tight">
+    <aside className="-ml-[8px] mb-4 sm:mb-8 tracking-tight">
       <div className="lg:sticky lg:top-20">
         <nav
           className="flex flex-row  items-center justify-between relative px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
@@ -24,7 +24,7 @@ export function Navbar() {
                 <Link
                   key={path}
                   href={path}
-                  className="transition-all font-mono text-muted-foreground hover:text-primary flex align-middle relative py-1 px-2 m-1"
+                  className="transition-all text-sm font-mono hover:bg-muted rounded text-muted-foreground hover:text-primary flex align-middle relative py-0.5 px-1 m-1"
                 >
                   {name}
                 </Link>

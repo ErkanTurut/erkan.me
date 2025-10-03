@@ -13,7 +13,7 @@ export default function Page() {
       </div>
 
       <article className="prose mb-4">
-        {/* <CustomMDX source={about} /> */}
+        <CustomMDX source={about} />
       </article>
       {/* <Separator />
       <div className="my-8 ">
