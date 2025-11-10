@@ -1,6 +1,5 @@
-import { BlogPosts } from "app/components/posts";
-import { Separator } from "./components/ui/separator";
 import { CustomMDX } from "./components/mdx";
+import { PatrickBatemanCard } from "./components/patrick-bateman-card";
 import fs from "fs";
 import path from "path";
 export default function Page() {
@@ -15,11 +14,8 @@ export default function Page() {
       <article className="prose mb-4">
         <CustomMDX source={about} />
       </article>
-      {/* <Separator />
-      <div className="my-8 ">
-        <h2 className="text-xl font-semibold mb-2 ">Writing</h2>
-        <BlogPosts />
-      </div> */}
+
+      <PatrickBatemanCard />
     </section>
   );
 }

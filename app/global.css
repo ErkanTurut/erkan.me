@@ -254,3 +254,17 @@ table {
 @utility animate-spin-once {
   animation: spin-once 300ms ease-out both;
 }
+
+/* Shine animation for Patrick Bateman card */
+@keyframes shine {
+  0% {
+    background-position: 200% 200%;
+  }
+  100% {
+    background-position: -200% -200%;
+  }
+}
+
+@utility animate-shine {
+  animation: shine 2s ease-in-out infinite;
+}
