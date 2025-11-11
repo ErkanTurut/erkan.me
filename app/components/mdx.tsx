@@ -5,7 +5,7 @@ import { highlight } from "sugar-high";
 import React from "react";
 
 import { cn, slugify } from "@/lib/utils";
-import { CornersIcon } from "@radix-ui/react-icons";
+import * as RadixIcons from "@radix-ui/react-icons";
 
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
@@ -34,7 +34,11 @@ function CustomLink(props) {
 
   if (href.startsWith("/")) {
     return (
-      <Link href={href} {...props} className="no-underline">
+      <Link
+        href={href}
+        {...props}
+        className="underline underline-offset-2 decoration-1 "
+      >
         {props.children}
       </Link>
     );
@@ -44,7 +48,14 @@ function CustomLink(props) {
     return <a {...props} />;
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />;
+  return (
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      {...props}
+      className=" underline underline-offset-2 decoration-1"
+    />
+  );
 }
 
 function MDXImg(props: React.ImgHTMLAttributes<HTMLImageElement>) {
@@ -64,7 +75,7 @@ function MDXImg(props: React.ImgHTMLAttributes<HTMLImageElement>) {
           href={href}
           className="absolute top-2 right-2 z-10 rounded-sm p-1 text-xs text-muted-foreground font-medium backdrop-blur hover:bg-muted hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <CornersIcon />
+          <RadixIcons.CornersIcon />
         </Link>
       ) : null}
     </div>
@@ -109,6 +120,7 @@ let components: MDXRemoteProps["components"] = {
   a: CustomLink,
   code: Code,
   Table,
+  ...RadixIcons,
 };
 
 export function CustomMDX(props) {

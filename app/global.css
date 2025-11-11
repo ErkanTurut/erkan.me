@@ -94,7 +94,7 @@ html {
 }
 
 .prose a {
-  @apply underline transition-all decoration-1 underline-offset-2 hover:decoration-[0.1em];
+  /* @apply underline transition-all decoration-1 underline-offset-2 hover:decoration-[0.1em]; */
 }
 
 .prose .anchor:after {

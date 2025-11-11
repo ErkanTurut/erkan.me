@@ -43,8 +43,9 @@ export function PatrickBatemanCard({
   const dimensions = { width: "400px", height: "226px" };
 
   // Motion values for smooth position transitions
-  const translateX = useMotionValue(0);
-  const translateY = useMotionValue(0);
+  // Start in hidden position (approximate offset based on card size)
+  const translateX = useMotionValue(360);
+  const translateY = useMotionValue(186);
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
 
