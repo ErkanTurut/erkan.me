@@ -178,12 +178,9 @@ export function PatrickBatemanCard({
               <div className="relative h-full flex flex-col justify-between">
                 {/* Top Section */}
                 <div className="flex justify-between items-start text-xs text-muted-foreground">
-                  <a
-                    href="https://cal.com/erkan/30min"
-                    className="tracking-wider font-light leading-tight"
-                  >
+                  <div className="tracking-wider font-light leading-tight">
                     212 555 6342
-                  </a>
+                  </div>
                   <div className="text-right">
                     <div className="tracking-[0.15em] font-light leading-none mb-0.5 ">
                       Pierce & Pierce
