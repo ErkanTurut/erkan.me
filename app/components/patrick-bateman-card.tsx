@@ -79,6 +79,31 @@ export function PatrickBatemanCard({
     debouncedHide(); // Start the debounced hide timer
   };
 
+  // Handle touch events for mobile
+  const handleTouchStart = async () => {
+    debouncedHide.cancel();
+    setIsHovered(true);
+
+    // Request permission immediately on touch for iOS
+    if (enableGyroscope && gyroscopePermission === "prompt") {
+      try {
+        console.log("Requesting gyroscope permission...");
+        const permission = await (
+          DeviceOrientationEvent as any
+        ).requestPermission();
+        console.log("Permission result:", permission);
+        setGyroscopePermission(permission === "granted" ? "granted" : "denied");
+      } catch (error) {
+        console.error("Error requesting gyroscope permission:", error);
+        setGyroscopePermission("denied");
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    debouncedHide();
+  };
+
   // Update position based on hover state
   useEffect(() => {
     if (isHovered) {
@@ -101,8 +126,11 @@ export function PatrickBatemanCard({
     if (!enableGyroscope) return;
 
     const checkGyroscopeSupport = async () => {
+      console.log("Checking gyroscope support...");
+
       // Check if DeviceOrientationEvent exists
       if (typeof DeviceOrientationEvent === "undefined") {
+        console.log("DeviceOrientationEvent not supported");
         setGyroscopePermission("unsupported");
         return;
       }
@@ -111,11 +139,14 @@ export function PatrickBatemanCard({
       if (
         typeof (DeviceOrientationEvent as any).requestPermission === "function"
       ) {
+        console.log("iOS device detected - permission required");
         setGyroscopePermission("prompt");
       } else if ("ondeviceorientation" in window) {
         // Android and older iOS versions don't require permission
+        console.log("Android device detected - no permission needed");
         setGyroscopePermission("granted");
       } else {
+        console.log("Device orientation not supported");
         setGyroscopePermission("unsupported");
       }
     };
@@ -123,36 +154,29 @@ export function PatrickBatemanCard({
     checkGyroscopeSupport();
   }, [enableGyroscope]);
 
-  // Request permission when card is first hovered (iOS only)
-  useEffect(() => {
-    if (!isHovered || !enableGyroscope) return;
-    if (gyroscopePermission !== "prompt") return;
-
-    const requestPermission = async () => {
-      try {
-        const permission = await (
-          DeviceOrientationEvent as any
-        ).requestPermission();
-        setGyroscopePermission(permission === "granted" ? "granted" : "denied");
-      } catch (error) {
-        console.error("Error requesting gyroscope permission:", error);
-        setGyroscopePermission("denied");
-      }
-    };
-
-    requestPermission();
-  }, [isHovered, enableGyroscope, gyroscopePermission]);
+  // Note: Permission request is now handled in handleTouchStart for better mobile UX
 
   // Handle gyroscope tilt effect
   useEffect(() => {
     if (!enableGyroscope || !isHovered) return;
-    if (gyroscopePermission !== "granted") return;
+    if (gyroscopePermission !== "granted") {
+      console.log("Gyroscope not active:", {
+        enableGyroscope,
+        isHovered,
+        gyroscopePermission,
+      });
+      return;
+    }
+
+    console.log("Setting up gyroscope listener...");
 
     const handleOrientation = (event: DeviceOrientationEvent) => {
       // beta: front-to-back tilt (-180 to 180)
       // gamma: left-to-right tilt (-90 to 90)
       const beta = event.beta ?? 0; // Front-back tilt
       const gamma = event.gamma ?? 0; // Left-right tilt
+
+      console.log("Gyroscope data:", { beta, gamma });
 
       // Map the values to rotation degrees
       // Clamp beta between -45 and 45 for more natural movement
@@ -168,8 +192,10 @@ export function PatrickBatemanCard({
     };
 
     window.addEventListener("deviceorientation", handleOrientation);
+    console.log("Gyroscope listener added");
 
     return () => {
+      console.log("Removing gyroscope listener");
       window.removeEventListener("deviceorientation", handleOrientation);
       // Reset rotation when gyroscope is disabled
       rotateX.set(0);
@@ -272,6 +298,8 @@ export function PatrickBatemanCard({
               }}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
               {/* Paper texture overlay */}
               <div
