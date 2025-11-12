@@ -26,6 +26,10 @@ interface PatrickBatemanCardProps {
   enableTilt?: boolean;
   /** Tilt intensity in degrees */
   tiltDegrees?: number;
+  /** Enable/disable gyroscope tilt effect on mobile devices */
+  enableGyroscope?: boolean;
+  /** Gyroscope tilt intensity multiplier (0-1) */
+  gyroscopeIntensity?: number;
 }
 
 export function PatrickBatemanCard({
@@ -35,10 +39,13 @@ export function PatrickBatemanCard({
   magneticRange = CARD_CONFIG.magneticRange,
   enableTilt = true,
   tiltDegrees = CARD_CONFIG.tiltDegrees,
+  enableGyroscope = true,
+  gyroscopeIntensity = 0.3,
 }: PatrickBatemanCardProps = {}) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [gyroPermissionGranted, setGyroPermissionGranted] = useState(false);
+  const [gyroscopePermission, setGyroscopePermission] = useState<
+    "granted" | "denied" | "prompt" | "unsupported"
+  >("unsupported");
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Determine dimensions
@@ -72,86 +79,6 @@ export function PatrickBatemanCard({
     debouncedHide(); // Start the debounced hide timer
   };
 
-  // Detect if device is mobile and request gyroscope permission
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        )
-      );
-    };
-    checkMobile();
-
-    // For iOS 13+ devices, we need to request permission
-    const requestGyroPermission = async () => {
-      if (
-        typeof DeviceOrientationEvent !== "undefined" &&
-        typeof (DeviceOrientationEvent as any).requestPermission === "function"
-      ) {
-        try {
-          const permission = await (
-            DeviceOrientationEvent as any
-          ).requestPermission();
-          setGyroPermissionGranted(permission === "granted");
-        } catch (error) {
-          console.error("Error requesting gyroscope permission:", error);
-        }
-      } else if (typeof DeviceOrientationEvent !== "undefined") {
-        // Android or older iOS - no permission needed
-        setGyroPermissionGranted(true);
-      }
-    };
-
-    if (isMobile) {
-      requestGyroPermission();
-    }
-  }, [isMobile]);
-
-  // Handle gyroscope tilt effect for mobile
-  useEffect(() => {
-    if (!enableTilt || !isMobile || !gyroPermissionGranted || !isHovered)
-      return;
-
-    const handleOrientation = (event: DeviceOrientationEvent) => {
-      if (event.beta === null || event.gamma === null) return;
-
-      // beta: front-to-back tilt (-180 to 180)
-      // gamma: left-to-right tilt (-90 to 90)
-
-      // Normalize values and apply tilt
-      // We'll use a reduced range for more natural movement
-      const beta = event.beta; // -180 to 180
-      const gamma = event.gamma; // -90 to 90
-
-      // Map beta (forward/backward tilt) to rotateX
-      // When phone tilts forward (beta increases from 0), card should tilt back (negative rotateX)
-      const normalizedBeta = Math.max(-45, Math.min(45, beta)); // Clamp to ±45°
-      const rotX = (normalizedBeta / 45) * -tiltDegrees;
-
-      // Map gamma (left/right tilt) to rotateY
-      const normalizedGamma = Math.max(-45, Math.min(45, gamma)); // Clamp to ±45°
-      const rotY = (normalizedGamma / 45) * tiltDegrees;
-
-      rotateX.set(rotX);
-      rotateY.set(rotY);
-    };
-
-    window.addEventListener("deviceorientation", handleOrientation);
-
-    return () => {
-      window.removeEventListener("deviceorientation", handleOrientation);
-    };
-  }, [
-    enableTilt,
-    isMobile,
-    gyroPermissionGranted,
-    isHovered,
-    tiltDegrees,
-    rotateX,
-    rotateY,
-  ]);
-
   // Update position based on hover state
   useEffect(() => {
     if (isHovered) {
@@ -169,9 +96,101 @@ export function PatrickBatemanCard({
     }
   }, [isHovered, translateX, translateY]);
 
-  // Handle mouse tilt effect for desktop
+  // Check for gyroscope support and request permission
   useEffect(() => {
-    if (!enableTilt || isMobile) return; // Skip mouse tilt on mobile
+    if (!enableGyroscope) return;
+
+    const checkGyroscopeSupport = async () => {
+      // Check if DeviceOrientationEvent exists
+      if (typeof DeviceOrientationEvent === "undefined") {
+        setGyroscopePermission("unsupported");
+        return;
+      }
+
+      // Check if permission API exists (iOS 13+)
+      if (
+        typeof (DeviceOrientationEvent as any).requestPermission === "function"
+      ) {
+        setGyroscopePermission("prompt");
+      } else if ("ondeviceorientation" in window) {
+        // Android and older iOS versions don't require permission
+        setGyroscopePermission("granted");
+      } else {
+        setGyroscopePermission("unsupported");
+      }
+    };
+
+    checkGyroscopeSupport();
+  }, [enableGyroscope]);
+
+  // Request permission when card is first hovered (iOS only)
+  useEffect(() => {
+    if (!isHovered || !enableGyroscope) return;
+    if (gyroscopePermission !== "prompt") return;
+
+    const requestPermission = async () => {
+      try {
+        const permission = await (
+          DeviceOrientationEvent as any
+        ).requestPermission();
+        setGyroscopePermission(permission === "granted" ? "granted" : "denied");
+      } catch (error) {
+        console.error("Error requesting gyroscope permission:", error);
+        setGyroscopePermission("denied");
+      }
+    };
+
+    requestPermission();
+  }, [isHovered, enableGyroscope, gyroscopePermission]);
+
+  // Handle gyroscope tilt effect
+  useEffect(() => {
+    if (!enableGyroscope || !isHovered) return;
+    if (gyroscopePermission !== "granted") return;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      // beta: front-to-back tilt (-180 to 180)
+      // gamma: left-to-right tilt (-90 to 90)
+      const beta = event.beta ?? 0; // Front-back tilt
+      const gamma = event.gamma ?? 0; // Left-right tilt
+
+      // Map the values to rotation degrees
+      // Clamp beta between -45 and 45 for more natural movement
+      const clampedBeta = Math.max(-45, Math.min(45, beta));
+      const clampedGamma = Math.max(-45, Math.min(45, gamma));
+
+      // Apply rotation with intensity multiplier
+      const rotX = (clampedBeta / 45) * tiltDegrees * gyroscopeIntensity;
+      const rotY = (clampedGamma / 45) * tiltDegrees * gyroscopeIntensity;
+
+      rotateX.set(rotX);
+      rotateY.set(rotY);
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+      // Reset rotation when gyroscope is disabled
+      rotateX.set(0);
+      rotateY.set(0);
+    };
+  }, [
+    enableGyroscope,
+    isHovered,
+    gyroscopePermission,
+    tiltDegrees,
+    gyroscopeIntensity,
+    rotateX,
+    rotateY,
+  ]);
+
+  // Handle mouse tilt effect (desktop only)
+  useEffect(() => {
+    if (!enableTilt) return;
+    // Disable mouse tilt if gyroscope is active
+    if (enableGyroscope && gyroscopePermission === "granted" && isHovered)
+      return;
 
     const card = cardRef.current;
     if (!card) return;
@@ -207,7 +226,15 @@ export function PatrickBatemanCard({
       card.removeEventListener("mousemove", handleMouseMove);
       card.removeEventListener("mouseleave", handleMouseLeaveCard);
     };
-  }, [isHovered, enableTilt, isMobile, tiltDegrees, rotateX, rotateY]);
+  }, [
+    isHovered,
+    enableTilt,
+    tiltDegrees,
+    rotateX,
+    rotateY,
+    enableGyroscope,
+    gyroscopePermission,
+  ]);
 
   return (
     <div className={cn("fixed z-50", "bottom-5 right-7", className)}>
