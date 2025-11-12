@@ -26,10 +26,6 @@ interface PatrickBatemanCardProps {
   enableTilt?: boolean;
   /** Tilt intensity in degrees */
   tiltDegrees?: number;
-  /** Enable/disable gyroscope tilt effect on mobile devices */
-  enableGyroscope?: boolean;
-  /** Gyroscope tilt intensity multiplier (0-1) */
-  gyroscopeIntensity?: number;
 }
 
 export function PatrickBatemanCard({
@@ -39,13 +35,8 @@ export function PatrickBatemanCard({
   magneticRange = CARD_CONFIG.magneticRange,
   enableTilt = true,
   tiltDegrees = CARD_CONFIG.tiltDegrees,
-  enableGyroscope = true,
-  gyroscopeIntensity = 0.3,
 }: PatrickBatemanCardProps = {}) {
   const [isHovered, setIsHovered] = useState(false);
-  const [gyroscopePermission, setGyroscopePermission] = useState<
-    "granted" | "denied" | "prompt" | "unsupported"
-  >("unsupported");
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Determine dimensions
@@ -79,31 +70,6 @@ export function PatrickBatemanCard({
     debouncedHide(); // Start the debounced hide timer
   };
 
-  // Handle touch events for mobile
-  const handleTouchStart = async () => {
-    debouncedHide.cancel();
-    setIsHovered(true);
-
-    // Request permission immediately on touch for iOS
-    if (enableGyroscope && gyroscopePermission === "prompt") {
-      try {
-        console.log("Requesting gyroscope permission...");
-        const permission = await (
-          DeviceOrientationEvent as any
-        ).requestPermission();
-        console.log("Permission result:", permission);
-        setGyroscopePermission(permission === "granted" ? "granted" : "denied");
-      } catch (error) {
-        console.error("Error requesting gyroscope permission:", error);
-        setGyroscopePermission("denied");
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    debouncedHide();
-  };
-
   // Update position based on hover state
   useEffect(() => {
     if (isHovered) {
@@ -121,102 +87,9 @@ export function PatrickBatemanCard({
     }
   }, [isHovered, translateX, translateY]);
 
-  // Check for gyroscope support and request permission
-  useEffect(() => {
-    if (!enableGyroscope) return;
-
-    const checkGyroscopeSupport = async () => {
-      console.log("Checking gyroscope support...");
-
-      // Check if DeviceOrientationEvent exists
-      if (typeof DeviceOrientationEvent === "undefined") {
-        console.log("DeviceOrientationEvent not supported");
-        setGyroscopePermission("unsupported");
-        return;
-      }
-
-      // Check if permission API exists (iOS 13+)
-      if (
-        typeof (DeviceOrientationEvent as any).requestPermission === "function"
-      ) {
-        console.log("iOS device detected - permission required");
-        setGyroscopePermission("prompt");
-      } else if ("ondeviceorientation" in window) {
-        // Android and older iOS versions don't require permission
-        console.log("Android device detected - no permission needed");
-        setGyroscopePermission("granted");
-      } else {
-        console.log("Device orientation not supported");
-        setGyroscopePermission("unsupported");
-      }
-    };
-
-    checkGyroscopeSupport();
-  }, [enableGyroscope]);
-
-  // Note: Permission request is now handled in handleTouchStart for better mobile UX
-
-  // Handle gyroscope tilt effect
-  useEffect(() => {
-    if (!enableGyroscope || !isHovered) return;
-    if (gyroscopePermission !== "granted") {
-      console.log("Gyroscope not active:", {
-        enableGyroscope,
-        isHovered,
-        gyroscopePermission,
-      });
-      return;
-    }
-
-    console.log("Setting up gyroscope listener...");
-
-    const handleOrientation = (event: DeviceOrientationEvent) => {
-      // beta: front-to-back tilt (-180 to 180)
-      // gamma: left-to-right tilt (-90 to 90)
-      const beta = event.beta ?? 0; // Front-back tilt
-      const gamma = event.gamma ?? 0; // Left-right tilt
-
-      console.log("Gyroscope data:", { beta, gamma });
-
-      // Map the values to rotation degrees
-      // Clamp beta between -45 and 45 for more natural movement
-      const clampedBeta = Math.max(-45, Math.min(45, beta));
-      const clampedGamma = Math.max(-45, Math.min(45, gamma));
-
-      // Apply rotation with intensity multiplier
-      const rotX = (clampedBeta / 45) * tiltDegrees * gyroscopeIntensity;
-      const rotY = (clampedGamma / 45) * tiltDegrees * gyroscopeIntensity;
-
-      rotateX.set(rotX);
-      rotateY.set(rotY);
-    };
-
-    window.addEventListener("deviceorientation", handleOrientation);
-    console.log("Gyroscope listener added");
-
-    return () => {
-      console.log("Removing gyroscope listener");
-      window.removeEventListener("deviceorientation", handleOrientation);
-      // Reset rotation when gyroscope is disabled
-      rotateX.set(0);
-      rotateY.set(0);
-    };
-  }, [
-    enableGyroscope,
-    isHovered,
-    gyroscopePermission,
-    tiltDegrees,
-    gyroscopeIntensity,
-    rotateX,
-    rotateY,
-  ]);
-
-  // Handle mouse tilt effect (desktop only)
+  // Handle tilt effect
   useEffect(() => {
     if (!enableTilt) return;
-    // Disable mouse tilt if gyroscope is active
-    if (enableGyroscope && gyroscopePermission === "granted" && isHovered)
-      return;
 
     const card = cardRef.current;
     if (!card) return;
@@ -252,15 +125,7 @@ export function PatrickBatemanCard({
       card.removeEventListener("mousemove", handleMouseMove);
       card.removeEventListener("mouseleave", handleMouseLeaveCard);
     };
-  }, [
-    isHovered,
-    enableTilt,
-    tiltDegrees,
-    rotateX,
-    rotateY,
-    enableGyroscope,
-    gyroscopePermission,
-  ]);
+  }, [isHovered, enableTilt, tiltDegrees, rotateX, rotateY]);
 
   return (
     <div className={cn("fixed z-50", "bottom-5 right-7", className)}>
@@ -298,8 +163,6 @@ export function PatrickBatemanCard({
               }}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
             >
               {/* Paper texture overlay */}
               <div
